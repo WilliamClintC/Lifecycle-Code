@@ -1,0 +1,7 @@
+May Retail Price Chart Extraction Summary
+=====================================
+
+Total PDFs processed: 7
+Successfully extracted charts: 7
+Failed extractions: 0
+

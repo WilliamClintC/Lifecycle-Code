@@ -1,21 +1,48 @@
 # Project Overview
 
-This is a data scraping project done for Professor. Ron Yang at UBC Sauder School of Business
-The project extracts retail datasets from JD Power. 
+This data scraping project was completed for Professor Ron Yang at the UBC Sauder School of Business. The objective was to extract and process retail datasets from JD Power publications, primarily in PDF format.
 
-The project does the following.
+## Project Workflow
 
-1. Collect all available PDF links through the following website
-    1. Official Website (C:\Users\clint\Desktop\Lifecycle Code\scripts\Link Scraper\official_website_scrape_links.py)
-    2. Dorking (C:\Users\clint\Desktop\Lifecycle Code\scripts\Link Scraper\dorking_scrape_links.py)
-    3. Official Website History Link (C:\Users\clint\Desktop\Lifecycle Code\scripts\Link Scraper\jdpower_history_scrape_links.py)
-        1. Manually remove "used car" links
-        2. Change the intermediary links to correct link (if intermediary link error exist the date is also wrong) (C:\Users\clint\Desktop\Lifecycle Code\data\pdf_links\individual\jdpower_commercial_truck_guidelines.csv)
-2. Download all the PDF links (C:\Users\clint\Desktop\Lifecycle Code\scripts\download_pdf_links.py)
-    1. redownload/analyze manually error links (C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\logs\error_links_20250411_085608.csv) (C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\logs\error_links_20250411_085608.csv)
-    2. Rename PDFs (C:\Users\clint\Desktop\Lifecycle Code\scripts\pdfs\pdf_renamer.py)
-    3. Manually Delete False Positive PDFs (C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs)
-    4. Manually Delete Duplicated PDFs
-3. Extract PDF tables
-    1. Tested different methodologies 
-        1. Title Identification (does not work: Some charts have unreadable text) (C:\Users\clint\Desktop\Lifecycle Code\archived_attempts\Chart Extraction\chart_extractor (title_identification).ipynb)
+### 1. Link Collection
+
+PDF links were scraped using multiple methods:
+
+- **Official Website Scraper**  
+  `official_website_scrape_links.py`  
+  *(Path: `C:\Users\clint\Desktop\Lifecycle Code\scripts\Link Scraper`)*
+
+- **Dorking-Based Scraper**  
+  `dorking_scrape_links.py`  
+  *(Path: same as above)*
+
+- **Historical Link Scraper (JD Power)**  
+  `jdpower_history_scrape_links.py`
+
+### 2. Link Cleaning and Validation
+
+- Manually removed irrelevant links (e.g., related to used cars).
+- Corrected intermediary links, ensuring date consistency.  
+  *(CSV path: `data\pdf_links\individual\jdpower_commercial_truck_guidelines.csv`)*
+
+### 3. PDF Downloading
+
+- All valid PDF links were downloaded using `download_pdf_links.py`.
+
+### 4. Error Handling
+
+- Identified and reprocessed problematic or failed downloads.  
+  *(Log path: `data\raw_pdfs\logs\error_links_20250411_085608.csv`)*
+
+### 5. File Management
+
+- Renamed PDFs for clarity and consistency using `pdf_renamer.py`.
+- Manually removed false positives and duplicate files.  
+  *(Folder: `data\raw_pdfs`)*
+
+### 6. Data Extraction
+
+- Extracted tables from the PDFs for analysis.
+- Tested various extraction approaches.
+  - *Note: Title-based identification methods proved ineffective due to inconsistent or unreadable text in some charts.*  
+    *(Notebook path: `archived_attempts\Chart Extraction\chart_extractor (title_identification).ipynb`)*
