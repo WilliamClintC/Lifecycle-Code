@@ -22,31 +22,30 @@ PDF links were scraped using multiple methods:
 ### 2. Link Cleaning and Validation
 
 - Manually removed irrelevant links (e.g., related to used cars)
-- Corrected intermediary links, ensuring date consistency  
+- Manually corrected intermediary links
+- Manually fixed date Inconsistencies 
   *(CSV location: `data/pdf_links/individual/jdpower_commercial_truck_guidelines.csv`)*
 
 ### 3. PDF Downloading
 
 - All valid PDF links were downloaded using `scripts/pdfs/download_pdf_links.py`
-
-### 4. Error Handling
-
-- Identified and reprocessed problematic or failed downloads
+- Manually identified and reprocessed problematic or failed downloads
 - Error logs stored in `data/raw_pdfs/logs/`
 
-### 5. File Management
+### 4. File Management
 
 - Renamed PDFs for clarity and consistency using `scripts/pdfs/pdf_renamer.py`
 - Manually removed false positives and duplicate files
 - All processed PDFs stored in `data/raw_pdfs/`
 
-### 6. Data Extraction
+### 5. Data Extraction
 
 - Extracted tables from PDFs for analysis using `scripts/pdfs/extract_pdf_content.py`
 - Tested various extraction approaches:
   - Title-based identification methods proved ineffective due to inconsistent or unreadable text in some charts
   - Embedded image detection showed limited success
   - **Contour detection** ultimately provided the best results
+-Manual Correction imlemented according to error log data\extracted_images\logs\extraction_errors.csv
 
 ## Repository Structure
 

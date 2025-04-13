@@ -10,16 +10,18 @@ import re
 import csv
 from datetime import datetime
 
-def crop_to_plot_bounding_box(image_path):
+def crop_to_plot_bounding_box(image_path, error_log_path=None):
     """
     Crop the image to the exact bounding box of the plot area using contour detection.
     Additionally, save an image with the bounding box drawn for visualization.
 
     Parameters:
         image_path (str): Path to the image to be cropped.
+        error_log_path (str, optional): Path to save error logs
 
     Returns:
         str: Path to the cropped image.
+        bool: Whether cropping was successful
     """
     # Open the image
     image = Image.open(image_path)
@@ -36,6 +38,10 @@ def crop_to_plot_bounding_box(image_path):
 
     # Sort contours by area (largest first)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
+
+    # Get the filename from the path for error logging
+    filename = os.path.basename(image_path)
+    pdf_name = filename.replace("_retail_price_plot.png", "").replace("_retail_price_plot_fallback.png", "")
 
     # Process the largest contour that might be the chart
     for contour in contours:
@@ -58,9 +64,6 @@ def crop_to_plot_bounding_box(image_path):
         # Crop the image to the bounding box
         cropped_image = image.crop((x, y, x + w, y + h))
 
-        # Get the filename from the path
-        filename = os.path.basename(image_path)
-        
         # Define the extracted images directory
         extracted_images_dir = r"C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images"
         os.makedirs(extracted_images_dir, exist_ok=True)
@@ -84,10 +87,27 @@ def crop_to_plot_bounding_box(image_path):
         draw_image.save(bbox_image_path)
         print(f"Bounding box visualization saved to {bbox_image_path}")
 
-        return cropped_image_path
+        return cropped_image_path, True
 
     print(f"No suitable plot detected in {image_path}. Skipping cropping.")
-    return image_path
+    
+    # Log the cropping failure if error_log_path is provided
+    if error_log_path:
+        try:
+            with open(error_log_path, 'a', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=['pdf_name', 'pdf_path', 'timestamp', 'error', 'pages_checked', 'detected_keywords'])
+                writer.writerow({
+                    'pdf_name': pdf_name,
+                    'pdf_path': image_path,
+                    'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'error': 'Image identified but cropping failed - No suitable plot contour detected',
+                    'pages_checked': 1,
+                    'detected_keywords': 'Cropping failure'
+                })
+        except Exception as e:
+            print(f"Failed to log cropping error: {str(e)}")
+    
+    return image_path, False
 
 def extract_retail_price_plots(pdf_path, output_dir=None, relaxed_detection=True, error_log_path=None):
     """
@@ -137,7 +157,9 @@ def extract_retail_price_plots(pdf_path, output_dir=None, relaxed_detection=True
     logs_dir = r"C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs"
     os.makedirs(logs_dir, exist_ok=True)
 
-    for page_num, page in enumerate(doc):
+    page_num = 0
+    while page_num < doc.page_count and not found_plot:
+        page = doc[page_num]
         page_index = page_num + 1
         print(f"\nAnalyzing page {page_index} for Retail Selling Price charts...")
         
@@ -200,26 +222,57 @@ def extract_retail_price_plots(pdf_path, output_dir=None, relaxed_detection=True
                 print(f"Saved Retail Selling Price chart to {plot_img_path}")
 
                 # Crop the image to the plot bounding box
-                cropped_img_path = crop_to_plot_bounding_box(plot_img_path)
+                cropped_img_path, success = crop_to_plot_bounding_box(plot_img_path, error_log_path)
 
-                # Record results
-                retail_price_results["plots_found"].append({
-                    "page": page_index,
-                    "image_path": cropped_img_path,
-                    "indicator_text": main_indicator['text']
-                })
+                if success:
+                    # Record results
+                    retail_price_results["plots_found"].append({
+                        "page": page_index,
+                        "image_path": cropped_img_path,
+                        "indicator_text": main_indicator['text']
+                    })
                 
-                # Mark that we found a plot in this PDF
-                found_plot = True
-                
-                # We found what we needed, no need to check other pages
-                break
+                    # Mark that we found a plot in this PDF
+                    found_plot = True
+                else:
+                    # No plot contours found, check the next page
+                    print(f"No plot contours found on page {page_index}. Checking next page.")
+                    
+                    # Check if there's a next page
+                    if page_num + 1 < doc.page_count:
+                        # Increment the page number and try the next page
+                        page_num += 1
+                        next_page = doc[page_num]
+                        next_page_index = page_num + 1
+                        print(f"Checking page {next_page_index} for charts...")
+                        
+                        # Capture the entire next page
+                        next_pix = next_page.get_pixmap(matrix=mat)
+                        next_plot_img_path = os.path.join(logs_dir, f"{pdf_name}_retail_price_plot_next_page.png")
+                        next_pix.save(next_plot_img_path)
+                        
+                        # Try to crop this next page
+                        next_cropped_img_path, next_success = crop_to_plot_bounding_box(next_plot_img_path, error_log_path)
+                        
+                        if next_success:
+                            retail_price_results["plots_found"].append({
+                                "page": next_page_index,
+                                "image_path": next_cropped_img_path,
+                                "indicator_text": "Next page after retail price title"
+                            })
+                            found_plot = True
+                            print(f"Found retail price chart on next page (page {next_page_index})!")
+                        else:
+                            print(f"No retail price chart found on next page either.")
                 
             except Exception as e:
                 error_msg = f"Error extracting plot: {str(e)}"
                 print(error_msg)
                 error_details["error"] = error_msg
-        else:
+        
+        # Move to the next page if we haven't found a plot yet
+        if not found_plot:
+            page_num += 1
             print(f"Page {page_index}: No Retail Selling Price chart detected")
 
     # If we couldn't find any retail price plot, try harder with fallback method
@@ -245,19 +298,48 @@ def extract_retail_price_plots(pdf_path, output_dir=None, relaxed_detection=True
                     print(f"Saved fallback capture to {plot_img_path}")
                     
                     # Run the bounding box detection on this image too
-                    cropped_img_path = crop_to_plot_bounding_box(plot_img_path)
+                    cropped_img_path, success = crop_to_plot_bounding_box(plot_img_path, error_log_path)
                     
-                    # Record results
-                    retail_price_results["plots_found"].append({
-                        "page": page_index,
-                        "image_path": cropped_img_path,
-                        "indicator_text": "Fallback capture - Price mention found",
-                        "is_fallback": True
-                    })
-                    
-                    # Mark that we found a plot (though it's a fallback)
-                    found_plot = True
-                    break
+                    if success:
+                        # Record results
+                        retail_price_results["plots_found"].append({
+                            "page": page_index,
+                            "image_path": cropped_img_path,
+                            "indicator_text": "Fallback capture - Price mention found",
+                            "is_fallback": True
+                        })
+                        
+                        # Mark that we found a plot (though it's a fallback)
+                        found_plot = True
+                        break
+                    else:
+                        # No plot contours found in fallback, check the next page
+                        print(f"No plot contours found on fallback page {page_index}. Checking next page.")
+                        
+                        # Check if there's a next page
+                        if page_num + 1 < doc.page_count:
+                            next_page = doc[page_num + 1]
+                            next_page_index = page_num + 2
+                            print(f"Checking page {next_page_index} for charts...")
+                            
+                            # Capture the entire next page
+                            next_pix = next_page.get_pixmap(matrix=mat)
+                            next_plot_img_path = os.path.join(logs_dir, f"{pdf_name}_retail_price_plot_fallback_next_page.png")
+                            next_pix.save(next_plot_img_path)
+                            
+                            # Try to crop this next page
+                            next_cropped_img_path, next_success = crop_to_plot_bounding_box(next_plot_img_path, error_log_path)
+                            
+                            if next_success:
+                                retail_price_results["plots_found"].append({
+                                    "page": next_page_index,
+                                    "image_path": next_cropped_img_path,
+                                    "indicator_text": "Next page after fallback retail price mention",
+                                    "is_fallback": True
+                                })
+                                found_plot = True
+                                print(f"Found retail price chart on next page after fallback (page {next_page_index})!")
+                                break
                 except Exception as e:
                     error_msg = f"Error in fallback capture: {str(e)}"
                     print(error_msg)
@@ -516,16 +598,8 @@ def process_all_pdfs_for_retail_price_charts(pdf_folder, output_dir=None, error_
 
 # If run directly, process one PDF or all PDFs in the folder
 if __name__ == "__main__":
-    # Process specific May PDFs as requested
-    pdf_files = [
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\05_2018.pdf",
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\05_2019.pdf",
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\05_2020.pdf",
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\05_2021.pdf",
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\05_2022.pdf",
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\05_2023.pdf",
-        r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\5_2024.pdf",
-    ]
+    # Process all PDFs in the raw_pdfs directory
+    pdf_folder = r"C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs"
     
     # Define main output directory for images
     output_dir = r"C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images"
@@ -547,7 +621,9 @@ if __name__ == "__main__":
             writer = csv.DictWriter(csvfile, fieldnames=['pdf_name', 'pdf_path', 'timestamp', 'error', 'pages_checked', 'detected_keywords'])
             writer.writeheader()
     
-    print(f"Processing {len(pdf_files)} PDFs...")
+    # Get all PDF files in the directory
+    pdf_files = [os.path.join(pdf_folder, f) for f in os.listdir(pdf_folder) if f.lower().endswith('.pdf')]
+    print(f"Found {len(pdf_files)} PDF files to process")
     
     successful = 0
     failed = []
@@ -606,9 +682,9 @@ if __name__ == "__main__":
             failed.append(pdf_name)
     
     # Create summary report
-    summary_path = os.path.join(logs_dir, "may_extraction_summary.txt")
+    summary_path = os.path.join(logs_dir, "full_extraction_summary.txt")
     with open(summary_path, "w") as f:
-        f.write(f"May Retail Price Chart Extraction Summary\n")
+        f.write(f"Retail Price Chart Extraction Summary\n")
         f.write(f"=====================================\n\n")
         f.write(f"Total PDFs processed: {len(pdf_files)}\n")
         f.write(f"Successfully extracted charts: {successful}\n")
@@ -628,6 +704,6 @@ if __name__ == "__main__":
     
     print(f"Summary report created at {summary_path}")
     
-    # Also generate a combined HTML report showing all charts
+    # Generate a combined HTML report showing all charts
     generate_combined_html_report(output_dir, pdf_files)
     print(f"Combined HTML report created at {os.path.join(logs_dir, 'all_charts_report.html')}")

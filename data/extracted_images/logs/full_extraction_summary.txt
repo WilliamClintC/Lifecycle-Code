@@ -1,0 +1,14 @@
+Retail Price Chart Extraction Summary
+=====================================
+
+Total PDFs processed: 79
+Successfully extracted charts: 73
+Failed extractions: 6
+
+Failed PDFs:
+- 01_2022
+- 06_2021
+- 07_2021
+- 10_2021
+- 11_2021
+- 12_2021

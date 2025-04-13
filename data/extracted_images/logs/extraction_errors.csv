@@ -1,0 +1,15 @@
+pdf_name,pdf_path,timestamp,error,pages_checked,detected_keywords,Corrected?
+01_2020,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\01_2020_retail_price_plot.png,4/12/2025 14:14,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+01_2022,C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\01_2022.pdf,4/12/2025 14:14,No retail price chart found,10,,Yes
+02_2021,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\02_2021_retail_price_plot.png,4/12/2025 14:14,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+03_2021,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\03_2021_retail_price_plot.png,4/12/2025 14:15,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+06_2021,C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\06_2021.pdf,4/12/2025 14:15,No retail price chart found,9,,Yes
+07_2021,C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\07_2021.pdf,4/12/2025 14:15,No retail price chart found,9,,Yes
+08_2021,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\08_2021_retail_price_plot.pngY,4/12/2025 14:15,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+09_2021,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\09_2021_retail_price_plot.png,4/12/2025 14:15,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+10_2020,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\10_2020_retail_price_plot.png,4/12/2025 14:15,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+10_2021,C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\10_2021.pdf,4/12/2025 14:15,No retail price chart found,9,,Yes
+11_2019,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\11_2019_retail_price_plot.png,4/12/2025 14:15,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+11_2021,C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\11_2021.pdf,4/12/2025 14:15,No retail price chart found,10,,Yes
+12_2019,C:\Users\clint\Desktop\Lifecycle Code\data\extracted_images\logs\12_2019_retail_price_plot.png,4/12/2025 14:15,Image identified but cropping failed - No suitable plot contour detected,1,Cropping failure,Yes
+12_2021,C:\Users\clint\Desktop\Lifecycle Code\data\raw_pdfs\12_2021.pdf,4/12/2025 14:15,No retail price chart found,10,,Yes
