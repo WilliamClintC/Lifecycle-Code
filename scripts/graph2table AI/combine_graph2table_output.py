@@ -36,6 +36,10 @@ def combine_csv_files():
         print(f"Processing dates in {filename}")
         df = process_dates(df)
         
+        # Standardize column names (3YD -> 3YO, 4YD -> 4YO, 5YD -> 5YO)
+        print(f"Standardizing column names in {filename}")
+        df = standardize_column_names(df)
+        
         # Add source file information
         df['Source_File'] = filename
         
@@ -66,6 +70,38 @@ def combine_csv_files():
     print(f"Date range: {combined_df['Date'].min()} to {combined_df['Date'].max()}")
     
     return combined_df
+
+def standardize_column_names(df):
+    """
+    Standardize column names to process YD/YO equivalencies:
+    3YD = 3YO, 4YD = 4YO, 5YD = 5YO
+    
+    This function handles both renaming existing columns and copying data
+    between equivalent columns if both exist.
+    """
+    # Define the column equivalencies
+    column_mapping = {
+        '3YD': '3YO',
+        '4YD': '4YO',
+        '5YD': '5YO'
+    }
+    
+    # Check and process each pair of equivalent columns
+    for yd_col, yo_col in column_mapping.items():
+        # Case 1: If only YD column exists, rename it to YO
+        if yd_col in df.columns and yo_col not in df.columns:
+            print(f"Renaming {yd_col} to {yo_col}")
+            df = df.rename(columns={yd_col: yo_col})
+        
+        # Case 2: If both columns exist, copy data from YD to YO where YO is missing
+        elif yd_col in df.columns and yo_col in df.columns:
+            print(f"Both {yd_col} and {yo_col} exist, merging data")
+            # Fill NaN values in YO column with values from YD column
+            df[yo_col] = df[yo_col].fillna(df[yd_col])
+            # Drop the YD column as it's now redundant
+            df = df.drop(columns=[yd_col])
+    
+    return df
 
 def process_dates(df):
     """

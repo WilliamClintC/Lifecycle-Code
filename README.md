@@ -2,7 +2,16 @@
 
 ## Project Overview
 
-This data scraping project was completed for Professor Ron Yang at the UBC Sauder School of Business. The objective was to extract and process retail datasets from JD Power publications, primarily in PDF format.
+This data extraction project was completed for Professor Ron Yang at the UBC Sauder School of Business. The objective was to extract and process retail price datasets from JD Power automotive publications, primarily available in PDF format, and convert them into structured, analyzable data.
+
+The project involved developing an end-to-end pipeline that began with scraping PDFs from the internet using various web scraping techniques (Google dorking, BeautifulSoup for HTML parsing, and Selenium for automated browser interactions). These PDFs were then processed to extract charts, which were subsequently digitized into data points, followed by validation of the extraction accuracy.
+
+The final datasets are available in two formats:
+
+- `data/final_dataset/AI.csv`: Data generated using Graph2Table AI extraction methods
+- `data/final_dataset/Webplot_Digitizer.csv`: Data generated using WebPlotDigitizer for validation and comparison purposes
+
+The methodology combines automated extraction techniques with manual verification to ensure data quality and consistency.
 
 ## Project Workflow
 
@@ -23,7 +32,7 @@ PDF links were scraped using multiple methods:
 
 - Manually removed irrelevant links (e.g., related to used cars)
 - Manually corrected intermediary links
-- Manually fixed date Inconsistencies 
+- Manually fixed date inconsistencies 
   *(CSV location: `data/pdf_links/individual/jdpower_commercial_truck_guidelines.csv`)*
 
 ### 3. PDF Downloading
@@ -40,48 +49,63 @@ PDF links were scraped using multiple methods:
 
 ### 5. Data Extraction
 
-- Extracted tables from PDFs for analysis using `scripts/pdfs/extract_pdf_content.py`
+- Extracted charts from PDFs for analysis using `scripts/pdfs/extract_pdf_content.py`
 - Tested various extraction approaches:
   - Title-based identification methods proved ineffective due to inconsistent or unreadable text in some charts
   - Embedded image detection showed limited success
   - **Contour detection** ultimately provided the best results
--Manual Correction imlemented according to error log data\extracted_images\logs\extraction_errors.csv
+- Manual corrections implemented according to error logs at `data/extracted_images/logs/extraction_errors.csv`
 
-6. graph2table AI conversion
-converts the images to csv datasets 
-placed the outputs here data\csv_data\graph2table
-7. WebPlotDigitizer Output  
-manually collected webplot digitzer output from 3 images (earliest, latest, middle, and one plot with 2YO truck data) C:\Users\clint\Desktop\Lifecycle Code\data\csv_data\webplotdigitizer\combined_digitizer_data.csv
+### 6. Image-to-CSV Conversion
 
-8. used ntoebook to analyze AI vs Manual collection C:\Users\clint\Desktop\Lifecycle Code\notebooks
+- Utilized Graph2Table AI for converting chart images to structured CSV datasets
+- Output files stored in `data/csv_data/graph2table/`
+- Manually identified and removed problematic conversions (e.g., the 03_2025 dataset)
 
+### 7. Manual Verification Process
 
-also used util scripts\utils\image_viewer.py to hlep view the images to check for errors
-utilities for manual fixes C:\Users\clint\Desktop\Lifecycle Code\scripts\utils\pdf_image_curator.py
-C:\Users\clint\Desktop\Lifecycle Code\scripts\utils\img_sorter.py  
+- Created reference datasets using WebPlotDigitizer for validation purposes `data/csv_data/webplotdigitizer/combined_digitizer_data.csv`
+- Manually digitized selected benchmark images (earliest, latest, middle timepoints, plus one 2YO truck dataset) 
+- Combined outputs stored at `data\csv_data\graph2table\combined_data.csv`
 
-C:\Users\clint\Desktop\Lifecycle Code\scripts\utils\img_errors_fix_img_to_csv.py
+### 8. Data Analysis & Validation
 
+- Developed Jupyter notebooks to analyze and compare AI-generated vs. manually digitized data
+- Conducted quality assurance and validation tests across the dataset
+- Analysis files available in the `notebooks/` directory
+
+### 9. Utility Tools
+
+Several utility scripts were developed to support the workflow:
+
+- `scripts/utils/image_viewer.py` - Visual inspection tool for extracted images
+- `scripts/utils/pdf_image_curator.py` - Manual correction utility for extracted images
+- `scripts/utils/img_sorter.py` - Organization tool for image datasets
+- `scripts/utils/img_errors_fix_img_to_csv.py` - Error correction tool for problematic image-to-CSV conversions
 
 ## Repository Structure
 
 ```
 ├── README.md
-├── archived_attempts/
-│   └── Chart Extraction/
+├── column_processor.ipynb        # Notebook for processing column data
+├── archived_attempts/            # Previous methodologies and approaches
+│   └── Chart Extraction/         # Early attempts at chart extraction
 ├── data/
-│   ├── corrected_images/
-│   ├── digitized_data/
-│   ├── edited_pdfs/
-│   ├── extracted_images/
-│   ├── final_dataset/
-│   ├── pdf_links/
-│   └── raw_pdfs/
-├── notebooks/
-├── Sandbox/
+│   ├── csv_data/                 # CSV outputs from image processing
+│   │   ├── graph2table/          # AI-generated CSV data
+│   │   └── webplotdigitizer/     # Manually verified CSV data
+│   ├── extracted_images/         # Charts extracted from PDFs
+│   │   └── logs/                 # Error logs from extraction process
+│   ├── pdf_links/                # Scraped PDF links
+│   │   ├── combined/             # Aggregated link collections
+│   │   └── individual/           # Source-specific link collections
+│   └── raw_pdfs/                 # Downloaded PDF source files
+│       └── logs/                 # Download error logs
+├── notebooks/                    # Analysis and verification notebooks
+│   └── CSV_explorer*.ipynb       # Various data exploration notebooks
+├── outputs/                      # Output visualizations and reports
 └── scripts/
-    ├── analyze_graph2table.py
-    ├── analyze_webplot.py
-    ├── compare_outputs.py
-    ├── pdfs/
-    └── utils/
+    ├── graph2table AI/           # Scripts for AI-based chart digitization
+    ├── pdfs/                     # PDF processing utilities
+    └── utils/                    # Helper scripts and utilities
+```
