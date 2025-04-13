@@ -86,7 +86,6 @@ Several utility scripts were developed to support the workflow:
 
 ```
 ├── README.md
-├── column_processor.ipynb        # Notebook for processing column data
 ├── archived_attempts/            # Previous methodologies and approaches
 │   └── chart_extraction/         # Early attempts at chart extraction
 ├── data/
