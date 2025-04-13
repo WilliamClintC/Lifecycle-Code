@@ -89,7 +89,7 @@ Several utility scripts were developed to support the workflow:
 ├── README.md
 ├── column_processor.ipynb        # Notebook for processing column data
 ├── archived_attempts/            # Previous methodologies and approaches
-│   └── Chart Extraction/         # Early attempts at chart extraction
+│   └── chart_extraction/         # Early attempts at chart extraction
 ├── data/
 │   ├── csv_data/                 # CSV outputs from image processing
 │   │   ├── graph2table/          # AI-generated CSV data
