@@ -47,6 +47,22 @@ PDF links were scraped using multiple methods:
   - **Contour detection** ultimately provided the best results
 -Manual Correction imlemented according to error log data\extracted_images\logs\extraction_errors.csv
 
+6. graph2table AI conversion
+converts the images to csv datasets 
+placed the outputs here data\csv_data\graph2table
+7. WebPlotDigitizer Output  
+manually collected webplot digitzer output from 3 images (earliest, latest, middle, and one plot with 2YO truck data) C:\Users\clint\Desktop\Lifecycle Code\data\csv_data\webplotdigitizer\combined_digitizer_data.csv
+
+8. used ntoebook to analyze AI vs Manual collection C:\Users\clint\Desktop\Lifecycle Code\notebooks
+
+
+also used util scripts\utils\image_viewer.py to hlep view the images to check for errors
+utilities for manual fixes C:\Users\clint\Desktop\Lifecycle Code\scripts\utils\pdf_image_curator.py
+C:\Users\clint\Desktop\Lifecycle Code\scripts\utils\img_sorter.py  
+
+C:\Users\clint\Desktop\Lifecycle Code\scripts\utils\img_errors_fix_img_to_csv.py
+
+
 ## Repository Structure
 
 ```
