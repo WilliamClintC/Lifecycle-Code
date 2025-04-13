@@ -38,8 +38,7 @@ PDF links were scraped using multiple methods:
 ### 3. PDF Downloading
 
 - All valid PDF links were downloaded using `scripts/pdfs/download_pdf_links.py`
-- Manually identified and reprocessed problematic or failed downloads
-- Error logs stored in `data/raw_pdfs/logs/`
+- Manually identified and reprocessed problematic or failed download according to error logs at `data/raw_pdfs/logs/`
 
 ### 4. File Management
 
@@ -50,7 +49,7 @@ PDF links were scraped using multiple methods:
 ### 5. Data Extraction
 
 - Extracted charts from PDFs for analysis using `scripts/pdfs/extract_pdf_content.py`
-- Tested various extraction approaches:
+- Tested various extraction approaches: (`archived_attempts`)
   - Title-based identification methods proved ineffective due to inconsistent or unreadable text in some charts
   - Embedded image detection showed limited success
   - **Contour detection** ultimately provided the best results
@@ -58,7 +57,7 @@ PDF links were scraped using multiple methods:
 
 ### 6. Image-to-CSV Conversion
 
-- Utilized Graph2Table AI for converting chart images to structured CSV datasets
+- Utilized Graph2Table AI for converting chart images to structured CSV datasets at `scripts\graph2table AI\run_graph2table.py`
 - Output files stored in `data/csv_data/graph2table/`
 - Manually identified and removed problematic conversions (e.g., the 03_2025 dataset)
 
@@ -71,7 +70,7 @@ PDF links were scraped using multiple methods:
 ### 8. Data Analysis & Validation
 
 - Developed Jupyter notebooks to analyze and compare AI-generated vs. manually digitized data
-- Conducted quality assurance and validation tests across the dataset
+- Conducted quality assurance and validation tests across and within datasets (analyzing yearly, quarterly, outliers, etc.)
 - Analysis files available in the `notebooks/` directory
 
 ### 9. Utility Tools
