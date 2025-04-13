@@ -70,7 +70,7 @@ PDF links were scraped using multiple methods:
 ### 8. Data Analysis & Validation
 
 - Developed Jupyter notebooks to analyze and compare AI-generated vs. manually digitized data
-- Conducted quality assurance and validation tests across and within datasets (analyzing yearly, quarterly, outliers, etc.)
+- Conducted quality assurance and validation tests across and within datasets (analyzing yearly, quarterly, outliers, differences etc.)
 - Analysis files available in the `notebooks/` directory
 
 ### 9. Utility Tools
